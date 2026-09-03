@@ -1,0 +1,97 @@
+name: azurite
+base: core24
+version: '3.37.0'
+title: Azurite
+license: Apache-2.0
+contact: https://github.com/canonical/azurite-snap/issues
+issues: https://github.com/canonical/azurite-snap/issues
+source-code: https://github.com/canonical/azurite-snap
+website: https://github.com/Azure/Azurite
+summary: Azure Storage API compatible server (emulator)
+description: |
+  Azurite is an open source Azure Storage API compatible server (emulator).
+  Based on Node.js, Azurite provides a cross platform experience for anyone
+  wanting to try Azure Storage easily in a local environment. It emulates the
+  Azure Blob, Queue and Table (preview) services.
+
+  This snap bundles its own Node.js runtime and exposes the following commands:
+
+    * azurite         - run the Blob, Queue and Table services together
+    * azurite.blob    - run only the Blob service (local Azure Blob storage)
+    * azurite.queue   - run only the Queue service
+    * azurite.table   - run only the Table service
+
+  By default, data is persisted under the snap's per-user common directory
+  ($SNAP_USER_COMMON, e.g. ~/snap/azurite/common). Pass "-l <path>" together
+  with the "home" interface to store data elsewhere in your home directory.
+
+  Default blob endpoint: http://127.0.0.1:10000/devstoreaccount1
+
+grade: stable
+confinement: strict
+
+platforms:
+  amd64:
+
+apps:
+  azurite:
+    command: bin/run-azurite
+    plugs:
+      - network
+      - network-bind
+      - home
+  blob:
+    command: bin/run-azurite-blob
+    daemon: simple
+    install-mode: disable
+    restart-condition: always
+    restart-delay: 20s
+    plugs:
+      - network
+      - network-bind
+      - home
+  queue:
+    command: bin/run-azurite-queue
+    daemon: simple
+    install-mode: disable
+    restart-condition: always
+    restart-delay: 20s
+    plugs:
+      - network
+      - network-bind
+      - home
+  table:
+    command: bin/run-azurite-table
+    daemon: simple
+    install-mode: disable
+    restart-condition: always
+    restart-delay: 20s
+    plugs:
+      - network
+      - network-bind
+      - home
+
+parts:
+  azurite:
+    plugin: npm
+    npm-include-node: true
+    npm-node-version: "22"
+    source: .
+    override-build: |
+      # The default npm plugin build extracts the bundled Node.js runtime into
+      # ${CRAFT_PART_INSTALL} and installs the (empty) wrapper package.json.
+      craftctl default
+      # Install Azurite itself as a top-level global package so that its
+      # command-line entry points are linked into ${CRAFT_PART_INSTALL}/bin.
+      npm install -g --prefix "${CRAFT_PART_INSTALL}" "azurite@${CRAFT_PROJECT_VERSION}"
+
+  wrappers:
+    after:
+      - azurite
+    plugin: dump
+    source: scripts/
+    organize:
+      run-azurite: bin/run-azurite
+      run-azurite-blob: bin/run-azurite-blob
+      run-azurite-queue: bin/run-azurite-queue
+      run-azurite-table: bin/run-azurite-table

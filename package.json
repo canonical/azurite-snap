@@ -1,0 +1,7 @@
+{
+  "name": "azurite-snap-wrapper",
+  "version": "3.37.0",
+  "private": true,
+  "description": "Wrapper package used to bundle Node.js for the Azurite snap",
+  "license": "MIT"
+}

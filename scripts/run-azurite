@@ -1,0 +1,4 @@
+#!/bin/sh
+# Persist data in the snap's writable per-user common directory by default.
+cd "${SNAP_USER_COMMON}" || exit 1
+exec "${SNAP}/bin/azurite" "$@"
