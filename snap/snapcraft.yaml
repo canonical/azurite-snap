@@ -25,6 +25,12 @@ description: |
   ($SNAP_USER_COMMON, e.g. ~/snap/azurite/common). Pass "-l <path>" together
   with the "home" interface to store data elsewhere in your home directory.
 
+  Configuration options:
+
+    * host   The IP address the services listen on. Defaults to 127.0.0.1
+             (local only). Use 0.0.0.0 to accept connections from remote
+             machines. Set with: snap set azurite host=0.0.0.0
+
   Default blob endpoint: http://127.0.0.1:10000/devstoreaccount1
 
 grade: stable

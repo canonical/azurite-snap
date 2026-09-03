@@ -1,4 +1,10 @@
 #!/bin/sh
 # Persist data in the snap's writable per-user common directory by default.
+# Listen host is taken from the snap "host" option (snap set azurite host=...).
+# Any explicit --blobHost/--queueHost/--tableHost passed on the command line
+# still wins, since Azurite honours the last occurrence of an option.
+HOST="$(snapctl get host 2>/dev/null || true)"
+[ -z "$HOST" ] && HOST="127.0.0.1"
 cd "${SNAP_USER_COMMON}" || exit 1
-exec "${SNAP}/bin/azurite" "$@"
+exec "${SNAP}/bin/azurite" \
+    --blobHost "$HOST" --queueHost "$HOST" --tableHost "$HOST" "$@"

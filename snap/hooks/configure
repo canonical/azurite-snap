@@ -1,0 +1,29 @@
+#!/bin/sh
+#
+# Configure hook for the Azurite snap.
+#
+# Supported options:
+#   host   The IP address / hostname the Blob, Queue and Table services listen
+#          on. Defaults to 127.0.0.1 (local only). Use 0.0.0.0 to accept
+#          connections from remote machines.
+#
+# Set it with:   snap set azurite host=0.0.0.0
+# Read it with:  snap get azurite host
+#
+set -e
+
+HOST="$(snapctl get host)"
+
+# Apply the default on first install / when unset.
+if [ -z "$HOST" ]; then
+    HOST="127.0.0.1"
+    snapctl set host="$HOST"
+fi
+
+# Basic validation: reject empty or whitespace-containing values.
+case "$HOST" in
+    "" | *[[:space:]]*)
+        echo "Invalid 'host' value: '$HOST' (must be a non-empty address without spaces)" >&2
+        exit 1
+        ;;
+esac
