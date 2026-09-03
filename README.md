@@ -12,7 +12,9 @@ confinement.
 
 ```
 azurite-snap/
-├── snap/snapcraft.yaml     # snap recipe (core24, strict confinement)
+├── snap/
+│   ├── snapcraft.yaml      # snap recipe (core24, strict confinement)
+│   └── hooks/configure     # validates & defaults the "host" config option
 ├── package.json            # wrapper manifest used to bundle the Node.js runtime
 └── scripts/                # launch wrappers (persist data in $SNAP_USER_COMMON)
     ├── run-azurite
@@ -65,6 +67,30 @@ By default, data is persisted under the snap's per-user common directory
 (`~/snap/azurite/common`). Any extra Azurite command-line options are passed
 through, e.g. `-l <path>` to change the workspace location (requires the `home`
 interface for paths inside your home directory).
+
+## Configuration
+
+The listen host IP is configurable via a snap option:
+
+| Option | Default     | Description                                              |
+|--------|-------------|----------------------------------------------------------|
+| `host` | `127.0.0.1` | IP address the Blob, Queue and Table services listen on. |
+
+```bash
+# Accept connections from remote machines (all interfaces)
+sudo snap set azurite host=0.0.0.0
+
+# Restrict back to local only
+sudo snap set azurite host=127.0.0.1
+
+# Inspect the current value
+sudo snap get azurite host
+```
+
+The value is validated by the snap's `configure` hook (empty or whitespace
+values are rejected) and applied the next time a service is started. An explicit
+`--blobHost`/`--queueHost`/`--tableHost` passed on the command line still takes
+precedence over the configured value.
 
 ### Default endpoints & credentials
 
